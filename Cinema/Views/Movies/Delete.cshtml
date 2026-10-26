@@ -1,0 +1,24 @@
+﻿
+@model global::Cinema.Models.Movie
+
+<h1 class="text-danger mb-4">Delete Movie</h1>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this movie?
+</div>
+
+<div class="card mb-4" style="max-width: 500px;">
+    <div class="card-body">
+        <h4>@Model.Name</h4>
+        <p><strong>Description:</strong> @Model.Des</p>
+        <p><strong>Price:</strong> @Model.Price</p>
+        <p><strong>Date:</strong> @Model.DateTime.ToString("yyyy-MM-dd HH:mm")</p>
+    </div>
+</div>
+
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

@@ -1,0 +1,118 @@
+﻿@model global::Cinema.ViewModels.DashboardVM
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1 class="mb-4">Dashboard</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-bg-primary h-100">
+            <div class="card-body">
+                <h6>Movies</h6>
+                <h2>@Model.MoviesCount</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-success h-100">
+            <div class="card-body">
+                <h6>Available Movies</h6>
+                <h2>@Model.AvailableMovies</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-warning h-100">
+            <div class="card-body">
+                <h6>Categories</h6>
+                <h2>@Model.CategoriesCount</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-danger h-100">
+            <div class="card-body">
+                <h6>Cinemas</h6>
+                <h2>@Model.CinemasCount</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-info h-100">
+            <div class="card-body">
+                <h6>Actors</h6>
+                <h2>@Model.ActorsCount</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-dark h-100">
+            <div class="card-body">
+                <h6>Total Price</h6>
+                <h2>@Model.TotalPrice.ToString("N2")</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Latest Movies</strong>
+                <a asp-controller="Movies" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Cinema</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in Model.LatestMovies)
+                        {
+                            <tr>
+                                <td>@m.Name</td>
+                                <td>@m.Category?.Name</td>
+                                <td>@m.Cinema?.Name</td>
+                                <td>@m.Price</td>
+                                <td>
+                                    @if (m.Status)
+                                    {
+                                        <span class="badge text-bg-success">Available</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge text-bg-danger">Not Available</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><strong>Movies per Category</strong></div>
+            <ul class="list-group list-group-flush">
+                @foreach (var item in Model.MoviesPerCategory)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        @item.Key
+                        <span class="badge text-bg-primary rounded-pill">@item.Value</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

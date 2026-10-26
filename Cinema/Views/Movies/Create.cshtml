@@ -1,0 +1,66 @@
+﻿@model global::Cinema.Models.Movie
+
+<h1 class="mb-4">Add New Movie</h1>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Movie Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Des" class="form-label">Description</label>
+        <textarea asp-for="Des" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Price" class="form-label">Price</label>
+        <input asp-for="Price" type="number" step="0.01" class="form-control" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DateTime" class="form-label">Date and Time</label>
+        <input asp-for="DateTime" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" />
+        <span asp-validation-for="DateTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Main Image</label>
+        <input type="file" name="ImageFile" class="form-control" accept="image/*" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Sub Images</label>
+        <input type="file" name="SubImageFiles" class="form-control" accept="image/*" multiple />
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="Status" class="form-check-input" />
+        <label asp-for="Status" class="form-check-label">Available</label>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+            <option value="0">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CinemaId" class="form-label">Cinema</label>
+        <select asp-for="CinemaId" asp-items="ViewBag.Cinemas" class="form-select">
+            <option value="0">-- Select Cinema --</option>
+        </select>
+        <span asp-validation-for="CinemaId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Movie</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
