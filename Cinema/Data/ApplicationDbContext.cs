@@ -2,7 +2,6 @@
 using Cinema.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Cinema.Data
 {
     public class ApplicationDbContext : DbContext
@@ -14,7 +13,11 @@ namespace Cinema.Data
         public DbSet<Actor> Actors { get; set; }
 
         public DbSet<Movie> Movies { get; set; }
+
         public DbSet<MovieSubImage> MovieSubImages { get; set; }
+
+        public DbSet<Booking> Bookings { get; set; }
+
         protected override void OnConfiguring(
             DbContextOptionsBuilder optionsBuilder)
         {
@@ -22,6 +25,33 @@ namespace Cinema.Data
 
             optionsBuilder.UseSqlServer(
                 "Data Source=LAPTOP-7D13UVG2;Initial Catalog=Cinema;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=30;Encrypt=True;TrustServerCertificate=True");
+        }
+
+       
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Movie>()
+                .HasMany(m => m.Actors)
+                .WithMany()
+                .UsingEntity<Dictionary<string, object>>(
+                    "MovieActors",
+                    j => j
+                        .HasOne<Actor>()
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<Movie>()
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j =>
+                    {
+                        j.HasKey("MovieId", "ActorId");
+                    });
+
         }
     }
 }

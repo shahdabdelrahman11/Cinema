@@ -1,0 +1,149 @@
+﻿
+@model global::Cinema.Models.Actor
+
+@{
+    ViewData["Title"] = "Edit Actor";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm mx-auto" style="max-width:650px;">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Edit Actor</h4>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Edit"
+                  asp-route-id="@Model.Id"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="FirstName" class="form-label">
+                        First Name
+                    </label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="LastName" class="form-label">
+                        Last Name
+                    </label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Bio" class="form-label">
+                        Biography
+                    </label>
+                    <textarea asp-for="Bio"
+                              class="form-control"
+                              rows="4"></textarea>
+                    <span asp-validation-for="Bio"
+                          class="text-danger"></span>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Img))
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Current Image</label>
+                        <div>
+                            <img src="@Model.Img"
+                                 alt="Current actor image"
+                                 style="width:120px;height:120px;object-fit:cover;border-radius:50%;" />
+                        </div>
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <label class="form-label">Change Actor Image</label>
+                    <input type="file"
+                           id="ImgFile"
+                           name="ImgFile"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png,.webp"
+                           onchange="previewActorImage(event)" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("ImgFile")
+                    </span>
+
+                    <small class="text-muted">
+                        Leave empty to keep the current image.
+                        JPG, PNG, or WEBP — maximum 5 MB.
+                    </small>
+
+                    <div id="previewContainer" class="mt-3"
+                         style="display:none;">
+                        <p>New image preview:</p>
+                        <img id="actorPreview"
+                             alt="New actor image preview"
+                             style="width:120px;height:120px;object-fit:cover;border-radius:50%;" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-warning">
+                    Save Changes
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let actorPreviewUrl = null;
+
+        function previewActorImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById("actorPreview");
+            const container = document.getElementById("previewContainer");
+
+            if (actorPreviewUrl) {
+                URL.revokeObjectURL(actorPreviewUrl);
+                actorPreviewUrl = null;
+            }
+
+            if (!file) {
+                preview.src = "";
+                container.style.display = "none";
+                return;
+            }
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            if (!allowedTypes.includes(file.type) ||
+                file.size > 5 * 1024 * 1024) {
+                alert("Choose a JPG, PNG, or WEBP image up to 5 MB.");
+                event.target.value = "";
+                preview.src = "";
+                container.style.display = "none";
+                return;
+            }
+
+            actorPreviewUrl = URL.createObjectURL(file);
+            preview.src = actorPreviewUrl;
+            container.style.display = "block";
+        }
+    </script>
+}

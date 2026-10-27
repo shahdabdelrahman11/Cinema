@@ -1,13 +1,21 @@
-﻿@model global::Cinema.Models.Movie
+﻿
+@model global::Cinema.Models.Movie
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 <h1 class="mb-4">Edit Movie</h1>
 
-<form asp-controller="Movies" asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+<form asp-controller="Movies"
+      asp-action="Edit"
+      asp-route-id="@Model.Id"
+      method="post"
+      enctype="multipart/form-data">
+
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="Id" />
 
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
+   
     <div class="mb-3">
         <label asp-for="Name" class="form-label">Movie Name</label>
         <input asp-for="Name" class="form-control" />
@@ -17,71 +25,167 @@
     <div class="mb-3">
         <label asp-for="Des" class="form-label">Description</label>
         <textarea asp-for="Des" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Des" class="text-danger"></span>
     </div>
 
+ 
     <div class="mb-3">
         <label asp-for="Price" class="form-label">Price</label>
-        <input asp-for="Price" type="number" step="0.01" class="form-control" />
+        <input asp-for="Price"
+               type="number"
+               step="0.01"
+               class="form-control" />
         <span asp-validation-for="Price" class="text-danger"></span>
     </div>
 
+  
     <div class="mb-3">
         <label asp-for="DateTime" class="form-label">Date and Time</label>
-        <input asp-for="DateTime" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control" />
+        <input asp-for="DateTime"
+               asp-format="{0:yyyy-MM-ddTHH:mm}"
+               type="datetime-local"
+               class="form-control" />
         <span asp-validation-for="DateTime" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Main Image</label>
+
         @if (!string.IsNullOrEmpty(Model.MainImg))
         {
             <div class="mb-2">
-                <img src="~/images/@Model.MainImg" style="height:120px" class="rounded"
+                <img src="~/images/@Model.MainImg"
+                     style="height:120px; max-width:100%; object-fit:cover;"
+                     class="rounded"
+                     alt="Current movie image"
                      onerror="this.style.display='none'" />
             </div>
         }
-        <input type="file" name="ImageFile" class="form-control" accept="image/*" />
-        <small class="text-muted">Leave empty to keep the current image</small>
+
+        <input type="file"
+               name="ImageFile"
+               class="form-control"
+               accept="image/*" />
+
+        <small class="text-muted">
+            Leave empty to keep the current image.
+        </small>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Current Sub Images</label>
-        <div class="d-flex flex-wrap gap-3 mb-2">
+
+        <div class="d-flex flex-wrap gap-3 mb-3">
             @foreach (var img in Model.SubImages)
             {
-                <div class="text-center">
-                    <img src="~/images/@img.Img" style="height:90px" class="rounded d-block mb-1"
+                <div class="text-center border rounded p-2">
+                    <img src="~/images/@img.Img"
+                         style="height:90px; max-width:120px; object-fit:cover;"
+                         class="rounded d-block mb-2"
+                         alt="Movie sub image"
                          onerror="this.style.display='none'" />
-                    <input type="checkbox" name="DeleteImageIds" value="@img.Id" /> Delete
+
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="DeleteImageIds"
+                               value="@img.Id"
+                               id="delete_image_@img.Id" />
+
+                        <label class="form-check-label"
+                               for="delete_image_@img.Id">
+                            Delete
+                        </label>
+                    </div>
                 </div>
             }
         </div>
 
+       
         <label class="form-label">Add Sub Images</label>
-        <input type="file" name="SubImageFiles" class="form-control" accept="image/*" multiple />
+        <input type="file"
+               name="SubImageFiles"
+               class="form-control"
+               accept="image/*"
+               multiple />
     </div>
 
+ 
     <div class="form-check mb-3">
         <input asp-for="Status" class="form-check-input" />
-        <label asp-for="Status" class="form-check-label">Available</label>
+        <label asp-for="Status" class="form-check-label">
+            Available
+        </label>
     </div>
 
     <div class="mb-3">
         <label asp-for="CategoryId" class="form-label">Category</label>
-        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+        <select asp-for="CategoryId"
+                asp-items="ViewBag.Categories"
+                class="form-select">
             <option value="0">-- Select Category --</option>
         </select>
         <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
 
+   
     <div class="mb-3">
         <label asp-for="CinemaId" class="form-label">Cinema</label>
-        <select asp-for="CinemaId" asp-items="ViewBag.Cinemas" class="form-select">
+        <select asp-for="CinemaId"
+                asp-items="ViewBag.Cinemas"
+                class="form-select">
             <option value="0">-- Select Cinema --</option>
         </select>
         <span asp-validation-for="CinemaId" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    
+    <div class="mb-3">
+        <label class="form-label fw-bold">Choose Actors</label>
+
+        <div class="border rounded p-3">
+            @if (ViewBag.Actors is IEnumerable<SelectListItem> actors
+                && actors.Any())
+            {
+                @foreach (var actor in actors)
+                {
+                    <div class="form-check mb-2">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="ActorIds"
+                               value="@actor.Value"
+                               id="actor_@actor.Value"
+                               checked="@actor.Selected" />
+
+                        <label class="form-check-label"
+                               for="actor_@actor.Value">
+                            @actor.Text
+                        </label>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    No actors available. Please add actors first.
+                </p>
+            }
+        </div>
+
+        <small class="text-muted">
+            Select or unselect actors to update the movie cast.
+        </small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Save Changes
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancel
+    </a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

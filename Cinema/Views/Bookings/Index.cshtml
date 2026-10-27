@@ -1,0 +1,79 @@
+﻿
+@model IEnumerable<global::Cinema.Models.Booking>
+
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Bookings</h1>
+
+        <a asp-controller="Movies"
+           asp-action="Index"
+           class="btn btn-primary">
+            Back to Movies
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer Name</th>
+                        <th>Movie</th>
+                        <th>Tickets</th>
+                        <th>Show Date</th>
+                        <th>Ticket Price</th>
+                        <th>Total Price</th>
+                        <th>Payment</th>
+                        <th>Booking Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        <tr>
+                            <td>@booking.Id</td>
+                            <td>@booking.CustomerName</td>
+                            <td>@(booking.Movie?.Name ?? "Unknown")</td>
+                            <td>@booking.NumberOfTickets</td>
+                            <td>
+                                @booking.ShowDateTime.ToString("yyyy-MM-dd HH:mm")
+                            </td>
+                            <td>
+                                @(booking.Movie?.Price.ToString("0.00") ?? "N/A")
+                            </td>
+                            <td>
+                                @if (booking.Movie != null)
+                                {
+                                    @((booking.Movie.Price * booking.NumberOfTickets).ToString("0.00"))
+                                }
+                                else
+                                {
+                                    <text>N/A</text>
+                                }
+                            </td>
+                            <td>@booking.PaymentMethod</td>
+                            <td>
+                                @booking.BookingDate.ToString("yyyy-MM-dd HH:mm")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            No bookings found yet.
+        </div>
+    }
+
+</div>

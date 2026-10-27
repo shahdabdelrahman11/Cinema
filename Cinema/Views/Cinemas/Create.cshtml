@@ -1,0 +1,135 @@
+﻿
+@model global::Cinema.Models.Cinema
+
+@{
+    ViewData["Title"] = "Add Cinema";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm mx-auto" style="max-width:650px;">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Add New Cinema</h4>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="Create"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">
+                        Cinema Name
+                    </label>
+                    <input asp-for="Name"
+                           class="form-control"
+                           placeholder="Enter cinema name" />
+                    <span asp-validation-for="Name"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">
+                        Description
+                    </label>
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter cinema description"></textarea>
+                    <span asp-validation-for="Description"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Address" class="form-label">
+                        Address
+                    </label>
+                    <input asp-for="Address"
+                           class="form-control"
+                           placeholder="Enter cinema address" />
+                    <span asp-validation-for="Address"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Cinema Logo</label>
+
+                    <input type="file"
+                           id="LogoFile"
+                           name="LogoFile"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png,.webp"
+                           onchange="previewLogo(event)" />
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("LogoFile")
+                    </span>
+
+                    <small class="text-muted d-block mt-1">
+                        Allowed formats: JPG, JPEG, PNG, WEBP.
+                        Maximum size: 5 MB.
+                    </small>
+
+                    <div class="mt-3" id="previewContainer"
+                         style="display:none;">
+                        <p class="mb-2">Logo Preview:</p>
+                        <img id="logoPreview"
+                             src=""
+                             alt="Cinema logo preview"
+                             style="width:140px;height:100px;object-fit:contain;border:1px solid #ddd;padding:5px;border-radius:8px;" />
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Cinema
+                    </button>
+
+                    <a asp-action="Index" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function previewLogo(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById("logoPreview");
+            const container = document.getElementById("previewContainer");
+
+            if (!file) {
+                preview.src = "";
+                container.style.display = "none";
+                return;
+            }
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            if (!allowedTypes.includes(file.type) ||
+                file.size > 5 * 1024 * 1024) {
+                alert("Choose a JPG, PNG, or WEBP image up to 5 MB.");
+                event.target.value = "";
+                preview.src = "";
+                container.style.display = "none";
+                return;
+            }
+
+            preview.src = URL.createObjectURL(file);
+            container.style.display = "block";
+        }
+    </script>
+}

@@ -1,5 +1,6 @@
-﻿using Cinema.Data;
-using Cinema.ViewModels;
+﻿
+using Cinema.Data;
+using global::Cinema.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,26 +17,80 @@ namespace Cinema.Controllers
 
         public IActionResult Index()
         {
+            var movies = db.Movies
+                .Include(m => m.Category)
+                .Include(m => m.Cinema)
+                .ToList();
+
+            var perCategory = movies
+                .GroupBy(m => m.Category?.Name ?? "Unknown")
+                .Select(g => new
+                {
+                    Name = g.Key,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            var perMonth = movies
+                .GroupBy(m => new
+                {
+                    m.DateTime.Year,
+                    m.DateTime.Month
+                })
+                .OrderBy(g => g.Key.Year)
+                .ThenBy(g => g.Key.Month)
+                .Select(g => new
+                {
+                    Label = $"{g.Key.Year}-{g.Key.Month:00}",
+                    Count = g.Count()
+                })
+                .ToList();
+
+            var latestBookings = db.Bookings
+                .Include(b => b.Movie)
+                .OrderByDescending(b => b.BookingDate)
+                .Take(10)
+                .ToList();
+
+            var bookingsCount = db.Bookings.Count();
+
+            var totalBookingValue = db.Bookings
+                .Where(b => b.Movie != null)
+                .Sum(b => (decimal?)(
+                    b.Movie!.Price * b.NumberOfTickets
+                )) ?? 0m;
+
             var vm = new DashboardVM
             {
-                MoviesCount = db.Movies.Count(),
-                AvailableMovies = db.Movies.Count(m => m.Status),
+                MoviesCount = movies.Count,
+                AvailableMovies = movies.Count(m => m.Status),
                 CategoriesCount = db.Categories.Count(),
                 CinemasCount = db.Cinemas.Count(),
-                ActorsCount = db.Actors.Count(),
-                TotalPrice = db.Movies.Sum(m => (decimal?)m.Price) ?? 0,
 
-                LatestMovies = db.Movies
-                    .Include(m => m.Category)
-                    .Include(m => m.Cinema)
+                BookingsCount = bookingsCount,
+                TotalBookingValue = totalBookingValue,
+                LatestBookings = latestBookings,
+
+                LatestMovies = movies
                     .OrderByDescending(m => m.Id)
-                    .Take(5)
+                    .Take(10)
                     .ToList(),
 
-                MoviesPerCategory = db.Movies
-                    .Include(m => m.Category)
-                    .GroupBy(m => m.Category!.Name)
-                    .ToDictionary(g => g.Key, g => g.Count())
+                CategoryLabels = perCategory
+                    .Select(x => x.Name)
+                    .ToList(),
+
+                CategoryCounts = perCategory
+                    .Select(x => x.Count)
+                    .ToList(),
+
+                MonthLabels = perMonth
+                    .Select(x => x.Label)
+                    .ToList(),
+
+                MonthCounts = perMonth
+                    .Select(x => x.Count)
+                    .ToList()
             };
 
             return View(vm);

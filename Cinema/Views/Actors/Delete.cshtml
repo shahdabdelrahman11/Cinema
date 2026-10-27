@@ -1,0 +1,61 @@
+﻿
+@model global::Cinema.Models.Actor
+
+@{
+    ViewData["Title"] = "Delete Actor";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm mx-auto border-danger"
+         style="max-width:600px;">
+
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Delete Actor</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="alert alert-warning">
+                Are you sure you want to delete this actor?
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Img))
+            {
+                <div class="text-center mb-3">
+                    <img src="@Model.Img"
+                         alt="Actor image"
+                         style="width:120px;height:120px;object-fit:cover;border-radius:50%;" />
+                </div>
+            }
+
+            <dl class="row">
+                <dt class="col-sm-4">Full Name</dt>
+                <dd class="col-sm-8">
+                    @Model.FirstName @Model.LastName
+                </dd>
+
+                <dt class="col-sm-4">Biography</dt>
+                <dd class="col-sm-8">
+                    @(string.IsNullOrWhiteSpace(Model.Bio)
+                        ? "No bio available"
+                        : Model.Bio)
+                </dd>
+            </dl>
+
+            <form asp-action="Delete"
+                  asp-route-id="@Model.Id"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="btn btn-danger">
+                    Confirm Delete
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
