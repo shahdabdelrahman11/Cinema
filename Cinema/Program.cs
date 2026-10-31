@@ -1,5 +1,8 @@
 using Cinema.Data;
+using Cinema.Repositories;
+using Cinema.Services;
 using Microsoft.EntityFrameworkCore;
+
 namespace Cinema
 {
     public class Program
@@ -7,31 +10,53 @@ namespace Cinema
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDbContext<ApplicationDbContext>();
-            // Add services to the container.
+
+          
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
+
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+            
+            builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddScoped<IMovieService, MovieService>();
+            builder.Services.AddScoped<IImageService, ImageService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ICinemaService, CinemaService>();
+            builder.Services.AddScoped<IActorService, ActorService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
+
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthorization();
 
-            app.MapStaticAssets();
+           
+            app.MapControllerRoute(
+                name: "areas",
+                pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"
+            );
+
+            
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Dashboard}/{action=Index}/{id?}")
-                .WithStaticAssets();
-
+                pattern: "{controller=Dashboard}/{action=Index}/{id?}"
+            );
+            app.MapGet("/", () => Results.Redirect("/Admin/Dashboard"));
             app.Run();
         }
     }

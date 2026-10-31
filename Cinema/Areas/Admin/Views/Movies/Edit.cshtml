@@ -1,0 +1,235 @@
+﻿
+@model global::Cinema.Models.Movie
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Edit Movie";
+
+    var categories = ViewBag.Categories as IEnumerable<SelectListItem>
+                     ?? Enumerable.Empty<SelectListItem>();
+
+    var cinemas = ViewBag.Cinemas as IEnumerable<SelectListItem>
+                  ?? Enumerable.Empty<SelectListItem>();
+
+    var actors = ViewBag.Actors as IEnumerable<SelectListItem>
+                 ?? Enumerable.Empty<SelectListItem>();
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Edit Movie</h1>
+        <a href="/Admin/Movies" class="btn btn-outline-secondary">
+            Back to Movies
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+            <form action="/Admin/Movies/Edit/@Model.Id"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div asp-validation-summary="All"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label class="form-label">Movie Name</label>
+                    <input type="text"
+                           name="Name"
+                           value="@Model.Name"
+                           class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea name="Des"
+                              class="form-control"
+                              rows="4">@Model.Des</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Price</label>
+                    <input type="number"
+                           name="Price"
+                           step="0.01"
+                           value="@Model.Price"
+                           class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Date and Time</label>
+                    <input type="datetime-local"
+                           name="DateTime"
+                           value="@Model.DateTime.ToString("yyyy-MM-ddTHH:mm")"
+                           class="form-control" />
+                </div>
+
+                <hr />
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Main Image</label>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.MainImg))
+                    {
+                        <div class="mb-3">
+                            <img src="/images/@Model.MainImg"
+                                 style="height:150px; max-width:250px; object-fit:contain;"
+                                 class="rounded border" />
+                        </div>
+                    }
+
+                    <input type="file"
+                           name="ImageFile"
+                           class="form-control"
+                           accept="image/*" />
+
+                    <small class="text-muted">
+                        Leave empty to keep the current image.
+                    </small>
+                </div>
+
+                <hr />
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">
+                        Current Additional Images
+                    </label>
+
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        @if (Model.SubImages != null && Model.SubImages.Any())
+                        {
+                            foreach (var img in Model.SubImages)
+                            {
+                                <div class="text-center border rounded p-2">
+                                    <img src="/images/@img.Img"
+                                         style="height:90px; width:120px; object-fit:cover;"
+                                         class="rounded d-block mb-2" />
+
+                                    <div class="form-check">
+                                        <input type="checkbox"
+                                               name="DeleteImageIds"
+                                               value="@img.Id"
+                                               id="delete_image_@img.Id"
+                                               class="form-check-input" />
+
+                                        <label for="delete_image_@img.Id"
+                                               class="form-check-label">
+                                            Delete
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No additional images.</p>
+                        }
+                    </div>
+
+                    <label class="form-label">Add New Images</label>
+                    <input type="file"
+                           name="SubImageFiles"
+                           class="form-control"
+                           accept="image/*"
+                           multiple />
+                </div>
+
+                <hr />
+
+                <div class="form-check mb-4">
+                    <input type="checkbox"
+                           name="Status"
+                           value="true"
+                           class="form-check-input"
+                           id="Status"
+                           checked="@(Model.Status)" />
+
+                    <input type="hidden" name="Status" value="false" />
+
+                    <label for="Status" class="form-check-label">
+                        Available
+                    </label>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select name="CategoryId" class="form-select">
+                        <option value="0">-- Select Category --</option>
+
+                        @foreach (var category in categories)
+                        {
+                            <option value="@category.Value"
+                                    selected="@(category.Value == Model.CategoryId.ToString())">
+                                @category.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Cinema</label>
+                    <select name="CinemaId" class="form-select">
+                        <option value="0">-- Select Cinema --</option>
+
+                        @foreach (var cinema in cinemas)
+                        {
+                            <option value="@cinema.Value"
+                                    selected="@(cinema.Value == Model.CinemaId.ToString())">
+                                @cinema.Text
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Choose Actors</label>
+
+                    <div class="border rounded p-3">
+                        @if (actors.Any())
+                        {
+                            foreach (var actor in actors)
+                            {
+                                <div class="form-check mb-2">
+                                    <input type="checkbox"
+                                           name="ActorIds"
+                                           value="@actor.Value"
+                                           id="actor_@actor.Value"
+                                           class="form-check-input"
+                                           checked="@(actor.Selected)" />
+
+                                    <label for="actor_@actor.Value"
+                                           class="form-check-label">
+                                        @actor.Text
+                                    </label>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No actors available.</p>
+                        }
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Save Changes
+                    </button>
+
+                    <a href="/Admin/Movies" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+﻿@model IEnumerable<global::Cinema.Models.Booking>
+
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<div class="container-fluid py-4">
+
+    <h1 class="mb-4">Bookings</h1>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Customer</th>
+                        <th>Movie</th>
+                        <th>Tickets</th>
+                        <th>Show Date</th>
+                        <th>Booked On</th>
+                        <th>Payment</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model)
+                    {
+                        <tr>
+                            <td>@b.Id</td>
+                            <td>@b.CustomerName</td>
+                            <td>@(b.Movie?.Name ?? "-")</td>
+                            <td>@b.NumberOfTickets</td>
+                            <td>@b.ShowDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@b.BookingDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td>@b.PaymentMethod</td>
+                            <td>
+                                <form asp-area="Admin"
+                                      asp-controller="Bookings"
+                                      asp-action="Delete"
+                                      asp-route-id="@b.Id"
+                                      method="post"
+                                      onsubmit="return confirm('Delete this booking?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">No bookings yet.</div>
+    }
+
+</div>

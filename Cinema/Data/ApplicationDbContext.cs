@@ -1,11 +1,16 @@
-﻿
-using Cinema.Models;
+﻿using Cinema.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace Cinema.Data
 {
     public class ApplicationDbContext : DbContext
     {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<Cinema.Models.Cinema> Cinemas { get; set; }
@@ -18,17 +23,7 @@ namespace Cinema.Data
 
         public DbSet<Booking> Bookings { get; set; }
 
-        protected override void OnConfiguring(
-            DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-
-            optionsBuilder.UseSqlServer(
-                "Data Source=LAPTOP-7D13UVG2;Initial Catalog=Cinema;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Connect Timeout=30;Encrypt=True;TrustServerCertificate=True");
-        }
-
-       
-protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
@@ -51,7 +46,6 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
                     {
                         j.HasKey("MovieId", "ActorId");
                     });
-
         }
     }
 }

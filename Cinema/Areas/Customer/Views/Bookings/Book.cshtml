@@ -1,0 +1,98 @@
+﻿@model global::Cinema.Models.Booking
+
+@{
+    ViewData["Title"] = "Book Movie";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+
+            <div class="card shadow">
+                <div class="card-body p-4">
+
+                   
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="mb-0">Book Your Movie</h2>
+
+                        <a asp-area="Customer" asp-controller="Movies" asp-action="Index"
+                           class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Movies
+                        </a>
+                    </div>
+
+                 
+                    <div class="alert alert-info">
+                        <strong>Movie:</strong> @ViewBag.MovieName
+                        <br />
+                        <strong>Ticket Price:</strong> @ViewBag.Price
+                        <br />
+                        <strong>Number of Tickets:</strong> @Model.NumberOfTickets
+                    </div>
+
+                 
+                    <form asp-area="Customer" asp-controller="Bookings" asp-action="Book" method="post">
+
+                        <input type="hidden" asp-for="MovieId" />
+
+                      
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="CustomerName" class="form-label">Your Name</label>
+                            <input asp-for="CustomerName"
+                                   class="form-control"
+                                   placeholder="Enter your full name" />
+                            <span asp-validation-for="CustomerName" class="text-danger"></span>
+                        </div>
+
+                       
+                        <div class="mb-3">
+                            <label asp-for="NumberOfTickets" class="form-label">Number of Tickets</label>
+                            <input asp-for="NumberOfTickets"
+                                   type="number"
+                                   min="1"
+                                   max="10"
+                                   class="form-control" />
+                            <span asp-validation-for="NumberOfTickets" class="text-danger"></span>
+                        </div>
+
+                       
+                        <div class="mb-3">
+                            <label asp-for="ShowDateTime" class="form-label">Show Date and Time</label>
+                            <input asp-for="ShowDateTime"
+                                   type="datetime-local"
+                                   asp-format="{0:yyyy-MM-ddTHH:mm}"
+                                   class="form-control" />
+                            <span asp-validation-for="ShowDateTime" class="text-danger"></span>
+                        </div>
+
+                        <div class="alert alert-secondary">
+                            Payment method:
+                            <strong>Pay at Cinema</strong>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success flex-fill">
+                                <i class="bi bi-check-lg"></i>
+                                Confirm Booking
+                            </button>
+
+                            <a asp-area="Customer" asp-controller="Movies" asp-action="Index"
+                               class="btn btn-secondary flex-fill">
+                                Cancel
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
